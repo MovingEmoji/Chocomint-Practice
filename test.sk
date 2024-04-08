@@ -1,0 +1,24 @@
+command /test2:
+	trigger:
+		set {_json} to new json
+		put json value plugin uptime tick at "uptime" in {_json}
+		set dynamic value named "infomations" to {_json}
+		while true is true:
+			put json value plugin uptime tick at "uptime" in {_json}
+			set dynamic value named "infomations" to {_json}
+			wait a tick
+
+command /test3:
+	trigger:
+		play block particle 100 times at location 1.5 above player with redstone block
+
+
+on shoot:
+	set {_pro} to projectile
+	wait 3 tick
+	shoot {_pro} from shooter
+
+command /test4:
+	trigger:
+		set {_name} to username from uuid player's uuid
+		broadcast "%{_name}%"

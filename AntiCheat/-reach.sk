@@ -1,0 +1,50 @@
+on damage:
+	set {_reach.vector} to vector from yaw attacker's yaw and pitch attacker's pitch
+	set vector length of {_eye.vector} to 0.001
+	set {_head.location} to attacker's head location
+	set {_distance.vector} to vector between attacker and victim
+	set y of {_distance.vector} to 0
+	set {_distance.vector} to normalized value of {_distance.vector}
+
+	set {_n.vector} to vector from yaw -180 and pitch 0
+	set {_w.vector} to vector from yaw 90 and pitch 0
+	set {_s.vector} to vector from yaw 0 and pitch 0
+	set {_e.vector} to vector from yaw -90 and pitch 0
+
+	set {_n.angle} to angle between {_n.vector} and {_distance.vector}
+	set {_w.angle} to angle between {_w.vector} and {_distance.vector}
+	set {_s.angle} to angle between {_s.vector} and {_distance.vector}
+	set {_e.angle} to angle between {_e.vector} and {_distance.vector}
+	set {_angle} to {_n.angle}
+	if {_angle} >= {_w.angle}:
+		set {_angle} to {_w.angle}
+	if {_angle} >= {_s.angle}:
+		set {_angle} to {_s.angle}
+	if {_angle} >= {_e.angle}:
+		set {_angle} to {_e.angle}
+	#broadcast "%{_angle}%"
+	while {_victim} is not set:
+		set vector length of {_reach.vector} to vector length of {_reach.vector} + 0.001
+		set {_reach.location} to {_head.location} ~ {_reach.vector}
+		set {_victim.location} to location of victim
+		set y coord of {_victim.location} to y coord of {_reach.location}
+		set {_r} to 0.37 / cos({_angle})
+		if distance between {_victim.location} and {_reach.location} <= {_r}:
+			set {_victim} to victim
+		if vector length of {_reach.vector} >= 5:
+			exit loop
+
+	set {_victim.vector} to {nutil.player.velocity::%victim's uuid%}
+	set {_attacker.vector} to {nutil.player.velocity::%attacker's uuid%}
+	set vector length of {_reach.vector} to vector length of {_reach.vector} - vector length of {_victim.vector}
+	if vector length of {_reach.vector} >= 3.05:
+		set vector length of {_reach.vector} to vector length of {_reach.vector} - vector length of {_attacker.vector}
+		set {_c} to (vector length of {_attacker.vector} / 50) * (victim's ping + attacker's ping + 50)
+		set vector length of {_reach.vector} to vector length of {_reach.vector} - {_c}
+	if distance between attacker and victim <= vector length of {_reach.vector}:
+		send "Reach: %distance between attacker and victim%" to attacker
+	else:
+		send "Reach: %vector length of {_reach.vector}%" to attacker
+	#send "%vector length of {_eye.vector}% %vector length of {_attacker.vector}%" to attacker
+	#send "%{_reach.location}%" to attacker
+	#send "%vector length of {_distance.vecotor}%" to attacker

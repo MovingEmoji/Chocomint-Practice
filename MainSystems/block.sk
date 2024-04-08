@@ -1,0 +1,48 @@
+options:
+	prefix: &b[&enUtils&b]
+
+on load:
+	broadcast "{@prefix} &aSuccessfully loaded BlockPlacer"
+
+on unload:
+	broadcast "{@prefix} &cUnloaded BlockPlacer"
+
+on block place:
+	if player's gamemode is not creative:
+		if y coord of event-block <= 85.5:
+			event is not canceled
+			if {nutil.player.%player's uuid%::play} is set:
+				set {_matchnumber} to  {nutil.player.%player's uuid%::matchnumber}
+				add location of event-block to {nutil.match.block::%{_matchnumber}%::*}
+			else:
+				set {_now} to plugin uptime tick
+				set {nutil.block.main::%location of event-block%} to {_now}
+				loop 100 times:
+					if {nutil.block.main::%location of event-block%} is {_now}:
+						wait a tick
+				if {nutil.block.main::%location of event-block%} is {_now}:
+					set block at event-block to air
+
+		else:
+			cancel event
+			send "&cこれ以上高くブロックを積み上げることはできません。" to player
+
+on block break:
+	if player's gamemode is not creative:
+		if {nutil.player.%player's uuid%::play} is set:
+			set {_matchnumber} to  {nutil.player.%player's uuid%::matchnumber}
+			if {nutil.match.block::%{_matchnumber}%::*} contains location of event-block:
+				remove location of event-block from {nutil.match.block::%{_matchnumber}%::*}
+			else:
+				cancel event
+		else:
+			if {nutil.block.main::*} is not set:
+				cancel event
+			else if {nutil.block.main::%location of event-block%} is not set:
+				cancel event
+			else:
+				event is not canceled
+				delete {nutil.block.main::%location of event-block%}
+
+on quit:
+	delete {nutil.player.block.%player's uuid%::*}

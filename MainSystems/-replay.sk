@@ -1,0 +1,18 @@
+command /record [<text>]:
+	trigger:
+		if arg-1 is "start":
+			set {replay.toggle.%player's uuid%} to true
+			while {replay.toggle.%player's uuid%} is set:
+				set {replay.location.%player's uuid%::%plugin up time%} to location of player
+				set {replay.target.%player's uuid%::%plugin up time%} to player's targeted location
+				wait a tick
+		if arg-1 is "stop":
+			delete {replay.toggle.%player's uuid%}
+		if arg-1 is "play":
+			create npc named "%player%" with type player at location of player
+			loop {replay.location.%player's uuid%::*}:
+				teleport 
+				wait a tick
+on quit:
+	delete {replay.location.%player's uuid%::*}
+	delete {replay.target.%player's uuid%::*}

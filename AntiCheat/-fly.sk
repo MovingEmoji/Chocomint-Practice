@@ -1,0 +1,29 @@
+every a tick:
+	loop all players:
+		if flight mode of loop-player is false:
+			if block at location 1 below loop-player is air:
+				if {nutil.ac.player.%loop-player's uuid%::flyloc} is not set:
+					if loop-player's health > 0:
+						set {nutil.ac.player.%loop-player's uuid%::flyloc} to location of loop-player
+						set {nutil.ac.player.%loop-player's uuid%::flytime} to plugin uptime tick
+					else:
+						delete {nutil.ac.player.%loop-player's uuid%::flyloc}
+			else:
+				delete {nutil.ac.player.%loop-player's uuid%::flyloc}
+			if {nutil.ac.player.%loop-player's uuid%::flyloc} is set:
+				set {_flyloc} to {nutil.ac.player.%loop-player's uuid%::flyloc}
+				set y coord of {_flyloc} to 0
+				set {_loc} to location of loop-player
+				set y coord of {_loc} to 0
+				if distance between {_flyloc} and {_loc} >= 15:
+					kick loop-player
+					delete {nutil.ac.player.%loop-player's uuid%::flyloc}
+				delete {_flyloc} and {_loc}
+			if {nutil.ac.player.%loop-player's uuid%::flytime} is set:
+				if plugin uptime tick - {nutil.ac.player.%loop-player's uuid%::flytime} >= 200:
+					kick loop-player
+					delete {nutil.ac.player.%loop-player's uuid%::flytime}
+
+on death of player:
+	delete {nutil.ac.player.%victim's uuid%::flyloc}
+	delete {nutil.ac.player.%player's uuid%::flytime}

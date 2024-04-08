@@ -1,0 +1,13 @@
+on load:
+	set {nutil.webapp} to register new web app with port 8080
+
+on unload:
+	close web app {nutil.webapp}
+
+command /test:
+	trigger:
+		set {_json} to new json
+		put json value player's name at "name" in {_json}
+		put json value player's uuid at "UUID" in {_json}
+		broadcast "%{_json}%"
+		create new get in {nutil.webapp} at "/01" with json {_json}

@@ -1,0 +1,18 @@
+options:
+	prefix: &b[&enUtils&b]
+	effectname: GoldEffect
+
+on load:
+	broadcast "{@prefix} &bSuccessfully loaded GoldKillEffect"
+	add gold ingot named "{@effectname}" to {nutil.killeffect::*}
+
+on unload:
+	broadcast "{@prefix} &cUnloaded GoldKillEffect"
+	
+on death of player:
+	if {nutil.playerdata.%attacker's uuid%::killeffect} is "{@effectname}":
+		playBlockParticle(100, location 1.6 above victim, gold block)
+		wait a tick
+		play "ORB_PICKUP" to attacker and victim at volume 1 with pitch 0.8
+		play "ORB_PICKUP" to attacker and victim at volume 1 with pitch 0.1
+		play "ORB_PICKUP" to attacker and victim at volume 1 with pitch 0.5

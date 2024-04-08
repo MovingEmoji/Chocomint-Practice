@@ -1,0 +1,47 @@
+options:
+	prefix: &b[&enUtils&b]
+
+on load:
+	broadcast "{@prefix} &bSuccessfully loaded KillEffectAPI"
+
+on unload:
+	broadcast "{@prefix} &cUnloaded KillEffectAPI"
+	delete {nutil.killeffect::*}
+
+function playBlockParticle(times: number, lc: location, type: itemtype):
+	play block particle {_times} times at {_lc} with {_type}
+
+function getEffectName(i: item) :: text:
+	set {_name} to {_i}'s name
+	replace "&e" with "" in {_name}
+	replace "&a" with "" in {_name}
+	return {_name}
+
+function openKillEffects(p: player):
+	set {_inv} to chest inventory with 6 rows named "&bKillEffect"
+	set {_slot} to 0
+	loop 9 times:
+		set slot {_slot} of {_inv} to black stained glass pane
+		add 1 to {_slot}
+	set {_uuid} to uuid of {_p}
+	loop {nutil.killeffect::*}:
+		if {nutil.playerdata.%{_uuid}%::killeffect} is getEffectName(loop-value):
+			set slot {_slot} of {_inv} to shiny loop-value named "&a%getEffectName(loop-value)%"
+		else:
+			set slot {_slot} of {_inv} to loop-value named "&e%getEffectName(loop-value)%"
+		add 1 to {_slot}
+	open {_inv} for {_p}
+
+command /killeffect:
+	trigger:
+		if hasPermission(player,"nutil.killeffect") is true:
+			openKillEffects(player)
+
+on inventory click:
+	if player's current inventory's name is "&bKillEffect":
+		cancel event
+		if getEffectName(event-item) is set:
+			set {nutil.playerdata.%player's uuid%::killeffect} to getEffectName(event-item)
+			play "LEVEL_UP" to player at volume 1 with pitch 1.2
+			send "&aSelected %getEffectName(event-item)%"
+			openKillEffects(player)

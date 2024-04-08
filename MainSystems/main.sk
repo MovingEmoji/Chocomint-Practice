@@ -1,0 +1,157 @@
+options:
+	prefix: &b[&enUtils&b]
+
+on load:
+	broadcast "{@prefix} &aSuccessfully loaded MainCore"
+
+on unload:
+	broadcast "{@prefix} &cUnloaded MainCore"
+
+function openKit(p: player, name: text, type: text):
+	if {_type} is "Ranked":
+
+		send "&cランクは現在非対応です。" to {_p}
+		#ここにランクが遊べるキットを書く
+		#--------------------------------------
+		#add "Sharp2Prot2" to {_list::*}
+
+		#--------------------------------------
+
+		set {_n} to size of {_list::*}
+	else:
+		set {_list::*} to {nutil.kit.list::*}
+		set {_n} to size of {_list::*}
+	set {_rows} to 1
+	while {_n} > 9:
+		subtract 9 from {_n}
+		add 1 to {_rows}
+	set {_slot} to 0
+	set {_inv} to chest inventory with {_rows} rows named {_name}
+	loop {_list::*}:
+		set slot {_slot} of {_inv} to  {nutil.kit.icon::%loop-value%} named "&b%loop-value%"
+		add 1 to {_slot}
+	if {_type} contains "Ranked":
+		set {_inv} to setLore({_inv},{_type})
+	if {_type} is "Duel":
+		set {_inv} to setLore({_inv},{_type})
+	open {_inv} for {_p}
+
+function autoTips():
+	broadcast "&7・"
+	loop all players:
+		send "&7 ｜  <open url:https://discord.chocomint.cc><tooltip:&9Let's communication another player>&9&l[Discord]  &fdiscord.chocomint.cc<reset>" to loop-player
+		
+		send "&7 ｜  <open url:https://store.chocomint.cc><tooltip:&dWe lost many money per month, please donate to our server>&d&l[Store]  &fstore.chocomint.cc<reset>" to loop-player
+
+		send "&7 ｜  <open url:https://www.chocomint.cc><tooltip:&aLet's get new game infomation>&a&l[Web]  &fwww.chocomint.cc<reset>" to loop-player
+
+		play "ORB_PICKUP" to loop-player at volume 0.5 with pitch 1.5
+	broadcast "&7・"
+
+on join:
+	teleport player to {nutil.location::lobby}
+	resetPlayer(player)
+
+on weather change:
+	cancel event
+
+on hunger meter change:
+	if {nutil.player.%player's uuid%::combat} is not set:
+		if {nutil.player.%player's uuid%::start} is not set:
+			cancel event
+	if {nutil.player.%player's uuid%::start} is not set:
+		if {nutil.player.%player's uuid%::combat} is not set:
+			cancel event
+	if {nutil.player.%player's uuid%::play} is set:
+		set {_kit} to {nutil.player.%player's uuid%::play}
+		if {nutil.kit.flag::%{_kit}%} contains "Sumo" or "Counter" or "MLG" or "Bridge":
+			cancel event
+on drop:
+	if {nutil.player.%player's uuid%::combat} is not set:
+		if {nutil.player.%player's uuid%::play} is not set:
+			cancel event
+	else if {nutil.player.%player's uuid%::play} is not set:
+		if {nutil.player.%player's uuid%::combat} is not set:
+			cancel event
+on death of player:
+	remove all water bottle from drops
+
+on consume:
+	if event-item is golden apple:
+		remove regeneration from the player
+		remove absorption from the player
+		if event-item's name is "Golden Head":
+			apply regeneration 2 to player for 10 seconds
+		set {_kit} to {nutil.player.%player's uuid%::play}
+		if {nutil.kit.flag::%{_kit}%} contains "Bridge":
+			cancel event
+			remove 1 golden apple from player's inventory
+			play "BURP" to player at volume 1 with pitch 1
+			heal player
+
+on join:
+	set tab header to "&aChocoMint &fNetwork" and footer to "                    &achocomint.cc                    " for player
+
+every 3 minutes:
+	autoTips()
+
+command /tips:
+	permission: admin
+	trigger:
+		autoTips()
+
+on drop:
+	if player does not have sword:
+		cancel event
+		send "&cインベントリ内の最後の攻撃アイテムを捨てることはできません。" to player
+		play "NOTE_BASS_GUITAR" to player at volume 0.5 with pitch 0.5
+
+on quit:
+	wait a tick
+	delete player's playerdata
+
+command /lobby:
+	aliases: /l, /hub, /leave
+	trigger:
+		send player to server "Pass"
+
+command /maintenance:
+	permission: admin
+	trigger:
+		if {nutil.maintenance} is not set:
+			set {nutil.maintenance} to true
+			broadcast "&7&m----------------------------------"
+			broadcast "&c&lサーバーがメンテナンスモードに移行しました。"
+			broadcast "&7通常モードに移行されるまでは、キューに参加することはできません。"
+			broadcast "&7&m----------------------------------"
+		else:
+			delete {nutil.maintenance}
+			broadcast "&7&m----------------------------------"
+			broadcast "&a&lサーバーが通常モードに移行しました。"
+			broadcast "&7キュー参加を含むすべての機能が使用可能になります。"
+			broadcast "&7&m----------------------------------"
+
+
+on shoot:
+	if shooter's tool is bow:
+		if shooter's tool's name is "&6ArtemisBow":
+			set metadata value "Flight" of projectile to true
+			wait 5 tick
+			while metadata value "Flight" of projectile is set:
+				loop players in radius 10 around location of projectile:
+					if {_p} is not set:
+						if loop-player is not shooter:
+							set {_v} to vector between projectile and location 1.5 above loop-player
+							set vector length of {_v} to vector length of projectile's velocity * 0.7
+							set projectile's velocity to {_v}
+							set {_p} to loop-player
+							exit loop
+				wait a tick
+
+on projectile hit:
+	delete metadata value "Flight" of projectile
+
+command /artemis:
+	permission: admin
+	trigger:
+		give bow named "&6ArtemisBow" to player

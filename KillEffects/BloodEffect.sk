@@ -1,0 +1,18 @@
+options:
+	prefix: &b[&enUtils&b]
+	effectname: BloodEffect
+
+on load:
+	broadcast "{@prefix} &bSuccessfully loaded BloodKillEffect"
+	add redstone named "{@effectname}" to {nutil.killeffect::*}
+
+on unload:
+	broadcast "{@prefix} &cUnloaded BloodKillEffect"
+
+on death of player:
+	if {nutil.playerdata.%attacker's uuid%::killeffect} is "{@effectname}":
+		playBlockParticle(100, location 1.6 above victim, redstone block)
+		wait a tick
+		play "DIG_STONE" to attacker and victim at volume 1 with pitch 0.8
+		play "DIG_STONE" to attacker and victim at volume 1 with pitch 1
+		play "DIG_STONE" to attacker and victim at volume 1 with pitch 1.2

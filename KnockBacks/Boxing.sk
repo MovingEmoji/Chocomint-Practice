@@ -1,0 +1,70 @@
+options:
+	prefix: &b[&enUtils&b]
+	kit: Boxing
+
+on load:
+	broadcast "{@prefix} &2Successfully loaded {@kit}'s knockback"
+
+on unload:
+	broadcast "{@prefix} &4Unloaded {@kit}'s knockback"
+
+player velocity event:
+	if {nutil.player.%player's uuid%::play} is "{@kit}":
+		if {nutil.player.%player's uuid%::lastattack} is set:
+			if {nutil.player.%player's uuid%::damagecause} is attack:
+				cancel event
+				set {_ag} to {nutil.player.%player's uuid%::lastattack}
+				delete {nutil.player.%player's uuid%::lastattack} and {nutil.player.%player's uuid%::damagecause}
+				set {_ag.uuid} to uuid of {_ag}
+				set {_v} to player's velocity
+				if block 0.000000000000008 below location of player is air:
+					if {nutil.player.%player's uuid%::down} is not set:
+						#broadcast "ccombo"
+						set {nutil.player.%player's uuid%::down} to true
+						if {nutil.player.sprint::%{_ag.uuid}%} is true:
+							#set {nutil.player.sprint::%{_ag.uuid}%} to false
+							set x of {_v} to x of {_v} * 0.93
+							set z of {_v} to z of {_v} * 0.93
+							set y of {_v} to y of {_v} * 0.8
+						else:
+							#broadcast "ccombo not tap"
+							set x of {_v} to x of {_v} * 1.3
+							set z of {_v} to z of {_v} * 1.3
+							set y of {_v} to y of {_v} * 1.0
+						set y of {_v} to 0.362
+					else:
+						#broadcast "fly"
+						if {nutil.player.sprint::%{_ag.uuid}%} is true:
+							#set {nutil.player.sprint::%{_ag.uuid}%} to false
+							set x of {_v} to x of {_v} * 0.65
+							set z of {_v} to z of {_v} * 0.65
+							set y of {_v} to y of {_v} * 0.7
+							#set y of {_v} to 0.42
+							
+						else:
+							#broadcast "fly not tap"
+							set x of {_v} to x of {_v} * 1.47
+							set z of {_v} to z of {_v} * 1.47
+							set y of {_v} to y of {_v} * 1.1
+						set y of {_v} to 0.29
+				else:
+					if {nutil.player.sprint::%{_ag.uuid}%} is true:
+						#set {nutil.player.sprint::%{_ag.uuid}%} to false
+						set x of {_v} to x of {_v} * 0.9
+						set z of {_v} to z of {_v} * 0.9
+						set y of {_v} to y of {_v} * 0.8
+					else:
+						set x of {_v} to x of {_v} * 1.3
+						set z of {_v} to z of {_v} * 1.3
+						set y of {_v} to y of {_v} * 1.0
+					set y of {_v} to 0.362
+				#if {nutil.player.sprint::%{_ag.uuid}%} is true:
+				#	#set {nutil.player.sprint::%{_ag.uuid}%} to false
+				#	set x of {_v} to x of {_v} * 1.0
+				#	set z of {_v} to z of {_v} * 1.0
+				#	set y of {_v} to y of {_v} * 0.8
+				#else:
+				#	set x of {_v} to x of {_v} * 1.0
+				#	set z of {_v} to z of {_v} * 1.0
+				#	set y of {_v} to y of {_v} * 1.0
+				set player's velocity to {_v}

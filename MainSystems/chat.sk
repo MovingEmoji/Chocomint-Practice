@@ -1,0 +1,46 @@
+options:
+	prefix: &b[&enUtils&b]
+	word: "nigger kys ching chong chang noob fuck fack fucking 核 原爆 genbaku nigga niger nigar shit garbage trash 小日本 天安門事件 鬼子"
+
+on load:
+	broadcast "{@prefix} &aSuccessfully loaded ChatComponent"
+
+on unload:
+	broadcast "{@prefix} &cUnloaded ChatComponent"
+
+function chatFilter(message: text) :: text:
+	set {_word} to {@word}
+	set {_words::*} to {_word} split at " "
+	loop {_words::*}:
+		set {_filter} to ""
+		loop length of loop-value times:
+			set {_filter} to "%{_filter}%*"
+		replace loop-value with {_filter} in {_message}
+	return {_message}
+
+
+on chat:
+	cancel event
+	if {nutil.player.%player's uuid%::chatcooldown} is not set:
+		set {_t} to true
+	else if difference between {nutil.player.%player's uuid%::chatcooldown} and now >= 1 seconds:
+		set {_t} to true
+	if {_t} is set:
+		set {nutil.player.%player's uuid%::chatcooldown} to now
+		set {_message} to message
+		if player is op:
+			replace all "&" with "§" in {_message}
+			set {_message} to "%player%&7: &r%{_message}%"
+		else:
+			set {_message} to "%player%&7: %{_message}%"
+		if {nutil.prefix.list::%player's uuid%} is set:
+			set {_message} to "%{nutil.prefix.list::%player's uuid%}%%{_message}%"
+		set {_result} to chatFilter({_message})
+		send "%{_message}%" to player
+		loop all players:
+			if loop-player is not player:
+				send "%{_result}%" to loop-player
+		send "%{_message}% || %{_result}%" to console
+	else:
+		send "&cスパムしないでくさい。" to player
+		set {nutil.player.%player's uuid%::chatcooldown} to now

@@ -1,0 +1,25 @@
+on join:
+	set the join message to ""
+	wait a tick
+	send "&7&m------------------------------"
+	send "    &aWelcome to &2&lPractice&c(Beta)&f!!"
+	send ""
+	send "&a&l・&r&2/duel &e<player> &7- &fSend a duel"
+	send "&a&l・&r&2/spec &e<player> &7- &fSpec to match"
+	send "&a&l・&r&2/ping &7- &fShow your ping"
+	send "&a&l・&r&2/leave &7- &fLeave Match"
+	#send ""
+	send ""
+	send "&9&lDiscord&7: &fdiscord.chocomint.cc"
+	send "&7&m------------------------------"
+	play "LEVEL_UP" to player at volume 1 with pitch 1
+	
+on quit:
+	set the leave message to ""
+
+every 7 minutes:
+	broadcast ""
+	broadcast "Found Bug?"
+	broadcast "&fPlease report on &8Discord!"
+	broadcast "&fdiscord.chocomint.cc"
+	broadcast ""

@@ -1,0 +1,18 @@
+command /bot:
+	trigger:
+		create npc named "bot%random integer between 100000 and 999999%" with type player at location of player
+		set {npc.%player%} to last npc
+		wait a second
+		while player is online:
+			teleport npc {npc.%player%} to location 1 behind player
+			if player is sneaking:
+				make {npc.%player%} animate "SNEAK"
+			else:
+				make {npc.%player%} animate "STOP_SNEAKING"
+			make {npc.%player%} look at location 1 infront of player
+			wait a tick
+		destroy {npc.%player%}
+		delete {npc.%player%}
+on left click:
+	if {npc.%player%} is set:
+		make {npc.%player%} animate "ARM_SWING"

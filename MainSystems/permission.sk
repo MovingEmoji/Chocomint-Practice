@@ -1,0 +1,56 @@
+options:
+	prefix: &b[&enUtils&b]
+
+on load:
+	broadcast "{@prefix} &aSuccessfully loaded PermissionCommands"
+
+on unload:
+	broadcast "{@prefix} &cUnloaded PermissionCommands"
+
+function hasPermission(p: player, perm: text) :: boolean:
+	set {_uuid} to uuid of {_p}
+	if {_p} is op:
+		return true
+	else if {nutil.playerdata.%{_uuid}%::permissions} contains {_perm}:
+		return true
+	else:
+		send "&cYou don't have permission." to {_p}
+		return false
+
+command /permission [<text>] [<offline player>] [<text>]:
+	permission: admin
+	trigger:
+		if arg-1 is "add":
+			if {nutil.playerdata.%arg-2's uuid%::permissions} is not set:
+				set {nutil.playerdata.%arg-2's uuid%::permissions} to arg-3
+				send "&aAdded [&f%arg-3%&a] to %arg-2%'s permissions."
+			else if {nutil.playerdata.%arg-2's uuid%::permissions} does not contain arg-3:
+				set {nutil.playerdata.%arg-2's uuid%::permissions} to "%{nutil.playerdata.%arg-2's uuid%::permissions}% %arg-3%"
+				send "&aAdded [&f%arg-3%&a] to %arg-2%'s permissions."
+			else:
+				send "&c%arg-2% has this permission."
+		if arg-1 is "remove":
+			if {nutil.playerdata.%arg-2's uuid%::permissions} contains arg-3:
+				set {_perms::*} to {nutil.playerdata.%arg-2's uuid%::permissions} split at " "
+				set {_perm} to ""
+				loop {_perms::*}:
+					if loop-value is not arg-3:
+						if {_perm} is "":
+							set {_perm} to loop-value
+						else:
+							set {_perm} to "%{_perm}% %loop-value%"
+				if {_perm} is "":
+					delete {nutil.playerdata.%arg-2's uuid%::permissions}
+				else:
+					set {nutil.playerdata.%arg-2's uuid%::permissions} to {_perm}
+				send "&cremove [&f%arg-3%&c] from %arg-2%'s permissions."
+			else:
+				send "&c%arg-3% does not have this permission."
+		if arg-1 is "clear":
+			delete {nutil.playerdata.%arg-2's uuid%::permissions}
+			send "&cClear the %arg-2%'s permissions."
+		if arg-1 is "view":
+			set {_perms::*} to {nutil.playerdata.%arg-2's uuid%::permissions} split at " "
+			send "&e%arg-2%'s permissions."
+			loop {_perms::*}:
+				send "&e ｜ %loop-value%"

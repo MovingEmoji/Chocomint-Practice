@@ -1,0 +1,15 @@
+options:
+	prefix: &b[&enUtils&b]
+
+on load:
+	broadcast "{@prefix} &aSuccessfully loaded PingViewer"
+
+on unload:
+	broadcast "{@prefix} &cUnloaded PingViewer"
+
+command /ping [<player>]:
+	trigger:
+		if arg-1 is set:
+			send "%arg-1%'s ping is &a%player's ping%ms" to player
+		else:
+			send "Your ping is &a%player's ping%ms" to player
